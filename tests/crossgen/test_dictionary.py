@@ -39,5 +39,16 @@ def test_same_lexicon():
     res = dictionary.import_d2(dictionary_file)
 
     assert gt['lexicon'].keys() == res['lexicon'].keys()
-    for key in gt['lexicon'].keys():
-        assert gt['lexicon'][key] == res['lexicon'][key]
+    for key, val in gt['lexicon'].items():
+        assert val == res['lexicon'][key]
+
+
+def test_same_lexicon2():
+    dictionary_file = os.path.join(os.path.expanduser('~'), '.crossgen', 'dictionary-en-5000.tsv')
+
+    gt = dictionary.import_d(dictionary_file)
+    res = dictionary.import_d3(dictionary_file)
+
+    assert gt['lexicon'].keys() == res['lexicon'].keys()
+    for key, val in gt['lexicon'].items():
+        assert val == res['lexicon'][key]

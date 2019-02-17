@@ -5,7 +5,7 @@ from collections import namedtuple
 import csv
 import sys
 
-from src.crossgen import constants
+from src.crossgen import common
 
 
 def wiktionary_keys():
@@ -30,10 +30,29 @@ def load_dictionary(filename):
             yield Word(**item)
 
 
-def filter_dictionary(data, min_term_len=constants.minWordLength_absolute):
+def filter_dictionary(data, min_term_len=common.minWordLength_absolute):
     long_enough = (item for item in data if len(item.term) >= min_term_len)
     long_enough_alphas = (item for item in long_enough if item.term.isalpha())
     return long_enough_alphas
+
+
+def import_d3(filename):
+    print('Importing dictionary...')
+    data = load_dictionary(filename)
+    total_lines = count_lines(filename)
+    lexicon = {}
+    word_lookup = {word_id: item for word_id, item in enumerate(filter_dictionary(data))}
+
+    for word_id, item in word_lookup.items():
+        print(f'{word_id}/{total_lines} words imported ({word_id * 100 / total_lines}%)', end='\r', flush=True)
+        sys.stdout.flush()
+        word_length = len(item.term)
+        lw = {} if word_length not in lexicon else lexicon[word_length]
+        for idx, letter in enumerate(item.term):
+            lw[(idx, letter)] = {word_id} if (idx, letter) not in lw else lw[(idx, letter)] | {word_id}
+        lexicon[word_length] = lw
+    print('\t[DONE]')
+    return {'lexicon': lexicon, 'word_lookup': word_lookup}
 
 
 def import_d2(filename):
@@ -67,7 +86,7 @@ def import_d(filename):
         sys.stdout.flush()
         lang, term, pos, definition = line.strip('\n').split('\t')
         word_length = len(term)
-        if word_length >= constants.minWordLength_absolute and term.isalpha():
+        if word_length >= common.minWordLength_absolute and term.isalpha():
             if word_length not in lexicon:
                 lexicon[word_length] = {}
             for index, letter in enumerate(term):

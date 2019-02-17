@@ -1,0 +1,32 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  postgres:
+    container_name: "crossgen-postgres"
+    build: "postgres-docker"
+    hostname: "localhost"
+    ports:
+      - "5430:5432"
+    volumes:
+      - "/tmp:/tmp"
+    environment:
+      POSTGRES_USER: "crossgen"
+      POSTGRES_PASSWORD: "xQ755y7Gr3Bg"
+    restart: "unless-stopped"
+
+#  not working
+#  pgadmin:
+#    image: "dpage/pgadmin4"
+#    depends_on:
+#      - "postgres"
+#    ports:
+#      - "5555:80"
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: "crossgen@pgadmin.org"
+#      PGADMIN_DEFAULT_PASSWORD: "example"
+#    restart: "unless-stopped"
+
+volumes:
+  postgres-data:
